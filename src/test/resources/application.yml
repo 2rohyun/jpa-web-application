@@ -1,0 +1,20 @@
+spring:
+#  datasource:
+#    url: jdbc:h2:mem:test # 테스트를 위한 메모리 db 사용, 애플리케이션이 실행될 때 격리된 환경의 조그만 메모리 테스트 환경 제공
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: create
+#    properties:
+#      hibernate:
+#        #        show_sql: true --> System.out 에 하이버네이트 실행 SQL 을 남긴다.
+#        format_sql: true
+logging:
+  level:
+    org.hibernate.SQL: debug # logger 에 SQL 을 남기기 때문에 운영환경에서는 이것을 활용한다.
+    org.hibernate.type: trace
+
+#### 사실 위의 설정을 하지 않아도 spring boot 는 memory test db 로 동작한다. 따라서 위의 설정은 없어도 된다. ####
