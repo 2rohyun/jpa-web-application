@@ -1,9 +1,6 @@
 package book.shop.service;
 
-import book.shop.domain.Delivery;
-import book.shop.domain.Member;
-import book.shop.domain.Order;
-import book.shop.domain.OrderItem;
+import book.shop.domain.*;
 import book.shop.domain.item.Item;
 import book.shop.repository.ItemRepository;
 import book.shop.repository.MemberRepository;
@@ -69,7 +66,7 @@ public class OrderService {
     /**
      * 주문 검색
      */
-//    public List<Order> findOrders(OrderSearch orderSearch) {
-//        return orderRepository.findAll(orderSearch);
-//    }
+    public List<Order> findOrders(OrderSearch orderSearch) {
+        return orderRepository.findAllByString(orderSearch);
+    }
 }
