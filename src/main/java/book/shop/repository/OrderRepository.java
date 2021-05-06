@@ -2,6 +2,7 @@ package book.shop.repository;
 
 import book.shop.domain.Order;
 import book.shop.domain.OrderSearch;
+import book.shop.repository.order.simplequery.OrderSimpleQueryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -68,5 +69,35 @@ public class OrderRepository {
             query = query.setParameter("name", orderSearch.getMemberName());
         }
         return query.getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        )
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivery() {
+        return em.createQuery(
+                "select o from Order o" +
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d", Order.class
+        ).getResultList();
+    }
+
+    public List<Order> findAllWithItem() {
+        return em.createQuery(
+                "select distinct o from Order o" + // 실제 DB 에서는 distinct 로 중복을 제거할 수 없지만, ( 데이터가 완전 일치하지 않으므로 )
+                                                            // JPQL 에서는 중복을 제거하여 컬렉션에 담아준다.
+                        " join fetch o.member m" +
+                        " join fetch o.delivery d" +
+                        " join fetch o.orderItems oi" +
+                        " join fetch oi.item i", Order.class)
+                .getResultList();
     }
 }

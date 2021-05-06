@@ -1,6 +1,7 @@
 package book.shop.domain;
 
 import book.shop.domain.item.Item;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
