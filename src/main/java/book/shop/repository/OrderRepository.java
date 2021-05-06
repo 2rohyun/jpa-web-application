@@ -1,8 +1,9 @@
 package book.shop.repository;
 
-import book.shop.domain.Order;
-import book.shop.domain.OrderSearch;
+import book.shop.domain.*;
 import book.shop.repository.order.simplequery.OrderSimpleQueryDto;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -25,17 +26,41 @@ public class OrderRepository {
         return em.find(Order.class, id);
     }
 
-    //TODO ( queryDSL 로 검색을 위한 동적 쿼리 생성 )
-//    public List<Order> findALl(OrderSearch orderSearch) {
-//        return em.createQuery("select o from Order o join o.member m" +
-//                " where o.status = :status" +
-//                " and m.name like :name", Order.class)
-//                .setParameter("status", orderSearch.getOrderStatus())
-//                .setParameter("name", orderSearch.getMemberName())
-//                .setMaxResults(1000)
-//                .getResultList();
-//    }
+    /**
+     * Using queryDSL
+     */
+    public List<Order> findAll(OrderSearch orderSearch) {
+        QOrder order = QOrder.order;
+        QMember member = QMember.member;
 
+        JPAQueryFactory query = new JPAQueryFactory(em);
+
+        return query
+                .select(order)
+                .from(order)
+                .join(order.member, member)
+                .where(statusEq(orderSearch.getOrderStatus()), nameLike(orderSearch.getMemberName()))
+                .limit(1000)
+                .fetch();
+    }
+
+    private BooleanExpression nameLike(String memberName) {
+        if(!StringUtils.hasText(memberName)){
+            return null;
+        }
+        return QMember.member.name.like(memberName);
+    }
+
+    private BooleanExpression statusEq(OrderStatus statusCond) {
+        if (statusCond == null) {
+            return null;
+        }
+        return QOrder.order.status.eq(statusCond);
+    }
+
+    /**
+     * 실무에서 절대 사용하지 않는 안좋은 방법
+     */
     public List<Order> findAllByString(OrderSearch orderSearch) {
         //language=JPAQL
         String jpql = "select o From Order o join o.member m";
@@ -71,6 +96,9 @@ public class OrderRepository {
         return query.getResultList();
     }
 
+    /**
+     * JPQL 을 사용한 조회
+     */
     public List<Order> findAllWithMemberDelivery(int offset, int limit) {
         return em.createQuery(
                 "select o from Order o" +
